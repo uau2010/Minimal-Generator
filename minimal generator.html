@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MINIMAL GENERATOR</title>
+<style>
+  :root{
+    --bg:#0f1724;
+    --card:#0b1220;
+    --muted:#94a3b8;
+    --accent:#7c3aed;
+    --glass: rgba(255,255,255,0.03);
+    --radius:16px;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(800px 600px at 10% 10%, rgba(124,58,237,0.12), transparent 8%),
+      radial-gradient(700px 500px at 90% 90%, rgba(14,165,233,0.06), transparent 8%),
+      var(--bg);
+    color:#e6eef8;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:980px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:calc(var(--radius) + 4px);
+    padding:20px;
+    box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+    display:grid;
+    grid-template-columns: 1fr 420px;
+    gap:18px;
+    align-items:start;
+  }
+
+  header{
+    grid-column: 1 / -1;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:4px;
+  }
+  .brand{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .logo{
+    width:44px;
+    height:44px;
+    border-radius:10px;
+    background:linear-gradient(135deg,var(--accent), #06b6d4);
+    display:grid;
+    place-items:center;
+    box-shadow: 0 6px 20px rgba(124,58,237,0.18);
+    font-weight:700;
+    color:white;
+    font-size:18px;
+  }
+  h1{margin:0;font-size:18px}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
+
+  .controls{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:16px;
+    backdrop-filter: blur(6px);
+    min-height:220px;
+  }
+  label{
+    display:block;
+    font-size:12px;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .input, textarea, select{
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.03);
+    background:var(--glass);
+    color:inherit;
+    font-size:14px;
+    outline:none;
+    resize:vertical;
+  }
+  textarea{min-height:84px}
+  .row{display:flex;gap:10px}
+  .col{flex:1}
+  .small{width:120px}
+  .actions{
+    display:flex;
+    gap:10px;
+    margin-top:12px;
+  }
+  button{
+    appearance:none;
+    border:0;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+    background:linear-gradient(90deg,var(--accent), #06b6d4);
+    color:white;
+    box-shadow: 0 6px 18px rgba(6,182,212,0.08);
+  }
+  button.ghost{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.06);
+    color:var(--muted);
+    font-weight:600;
+    box-shadow:none;
+  }
+
+  .preview{
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));
+    border-radius:var(--radius);
+    padding:14px;
+    min-height:220px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    align-items:center;
+    justify-content:center;
+  }
+  .canvas{
+    width:100%;
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
+    border-radius:12px;
+    padding:10px;
+    display:grid;
+    place-items:center;
+    min-height:180px;
+    border:1px dashed rgba(255,255,255,0.03);
+    overflow:hidden;
+  }
+  .canvas img{max-width:100%; border-radius:8px; display:block}
+  .meta{display:flex; gap:8px; align-items:center; color:var(--muted); font-size:13px}
+
+  .spinner{
+    width:44px;height:44px;border-radius:50%;border:4px solid rgba(255,255,255,0.06);border-left-color:var(--accent);
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .notes{font-size:12px;color:var(--muted); margin-top:10px}
+  footer{grid-column:1/-1;text-align:right;font-size:12px;color:var(--muted); margin-top:8px}
+
+  @media (max-width:940px){
+    .wrap{grid-template-columns:1fr; padding:16px}
+    .preview{order: -1}
+  }
+</style>
+</head>
+<body>
+  <main class="wrap" role="main" aria-labelledby="title">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">MG</div>
+        <div>
+          <h1 id="title">MINIMAL GENERATOR</h1>
+          <p class="lead" id="lead">Texto → imagem. Simples, rápido e elegante.</p>
+        </div>
+      </div>
+
+      <div style="margin-left:12px;display:flex;gap:8px;align-items:center">
+        <label for="lang" style="color:var(--muted);font-size:13px">Idioma</label>
+        <select id="lang" class="input" style="width:150px">
+          <option value="pt">Português</option>
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+          <option value="zh">中文</option>
+          <option value="ja">日本語</option>
+        </select>
+      </div>
+    </header>
+
+    <section class="controls" aria-label="Controles">
+      <label for="prompt" id="labelPrompt">Prompt</label>
+      <textarea id="prompt" class="input" placeholder="Descreva a imagem...">Pôr do sol sobre o oceano</textarea>
+
+      <div style="height:10px"></div>
+
+      <div class="row">
+        <div class="col">
+          <label for="width" id="labelWidth">Largura (px)</label>
+          <input id="width" class="input small" type="number" min="64" max="3840" value="1280" />
+        </div>
+        <div class="col">
+          <label for="height" id="labelHeight">Altura (px)</label>
+          <input id="height" class="input small" type="number" min="64" max="2160" value="720" />
+        </div>
+        <div>
+          <label for="seed" id="labelSeed">Seed (opcional)</label>
+          <input id="seed" class="input small" type="number" placeholder="42" />
+        </div>
+      </div>
+
+      <div class="row" style="align-items:end">
+        <div class="col">
+          <label for="model" id="labelModel">Modelo</label>
+          <select id="model" class="input">
+            <option value="flux">flux</option>
+            <option value="kontext">kontext</option>
+            <option value="vintage">vintage</option>
+          </select>
+        </div>
+        <div style="min-width:120px">
+          <label for="nologo" id="labelNologo">Remover logo?</label>
+          <select id="nologo" class="input">
+            <option value="false">Não</option>
+            <option value="true">Sim (se suportado)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="generate">Gerar</button>
+        <button id="download" class="ghost" disabled>Baixar</button>
+        <button id="copy" class="ghost">Copiar prompt</button>
+        <button id="clear" class="ghost">Limpar</button>
+      </div>
+
+      <div class="notes" id="status">Pronto — defina um prompt e clique em Gerar.</div>
+    </section>
+
+    <aside class="preview" aria-label="Visualização">
+      <div class="canvas" id="canvas">
+        <div style="text-align:center;color:var(--muted)">
+          <div style="font-size:13px">Pré-visualização</div>
+        </div>
+      </div>
+
+      <div class="meta" id="meta">
+        <div id="info">—</div>
+      </div>
+    </aside>
+
+    <footer>© Julio Cezar De Zan Bicalho e da Pollynations</footer>
+  </main>
+
+<script>
+(function(){
+  const promptEl = document.getElementById('prompt');
+  const widthEl = document.getElementById('width');
+  const heightEl = document.getElementById('height');
+  const seedEl = document.getElementById('seed');
+  const modelEl = document.getElementById('model');
+  const nologoEl = document.getElementById('nologo');
+  const generateBtn = document.getElementById('generate');
+  const downloadBtn = document.getElementById('download');
+  const copyBtn = document.getElementById('copy');
+  const clearBtn = document.getElementById('clear');
+  const canvas = document.getElementById('canvas');
+  const status = document.getElementById('status');
+  const info = document.getElementById('info');
+  const langSelect = document.getElementById('lang');
+
+  let lastBlobUrl = null;
+  let abortController = null;
+
+  function setStatus(text){ status.textContent = text; }
+
+  function clearPreview(){
+    canvas.innerHTML = '<div style="text-align:center;color:var(--muted)"><div style="font-size:13px">Pré-visualização</div></div>';
+    info.textContent = '—';
+    downloadBtn.disabled = true;
+    if(lastBlobUrl){ URL.revokeObjectURL(lastBlobUrl); lastBlobUrl = null; }
+  }
+
+  function buildUrl(prompt){
+    const encoded = encodeURIComponent(prompt);
+    const base = `https://image.pollinations.ai/prompt/${encoded}`;
+    const params = new URLSearchParams();
+    const width = Math.max(64, Math.min(3840, Number(widthEl.value) || 1280));
+    const height = Math.max(64, Math.min(2160, Number(heightEl.value) || 720));
+    params.set('width', width);
+    params.set('height', height);
+    const seed = seedEl.value.trim(); if(seed) params.set('seed', seed);
+    const model = modelEl.value; params.set('model', model);
+    if(nologoEl.value === 'true') params.set('nologo','true');
+    params.set('_t', Date.now().toString());
+    return { url: base + '?' + params.toString(), width, height, model, seed: seed || '—' };
+  }
+
+  async function fetchImage(url, timeoutMs = 120000){
+    if(abortController) abortController.abort();
+    abortController = new AbortController();
+    const signal = abortController.signal;
+    const timeout = setTimeout(()=> abortController.abort(), timeoutMs);
+    try { const resp = await fetch(url, { signal }); clearTimeout(timeout); return resp; }
+    catch(err){ clearTimeout(timeout); throw err; }
+    finally { abortController = null; }
+  }
+
+  function showSpinner(){ canvas.innerHTML = '<div class="spinner"></div>'; }
+
+  generateBtn.addEventListener('click', async ()=>{
+    const prompt = promptEl.value.trim();
+    if(!prompt){ setStatus('Por favor, escreva um prompt.'); return; }
+    clearPreview(); setStatus('Gerando imagem — aguarde...'); showSpinner();
+    const meta = buildUrl(prompt);
+    info.textContent = `${meta.width}×${meta.height} • model: ${meta.model} • seed: ${meta.seed}`;
+    try {
+      const resp = await fetchImage(meta.url, 120000);
+      if(!resp.ok){ throw new Error('Erro ao gerar imagem'); }
+      const blob = await resp.blob();
+      if(lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
+      lastBlobUrl = URL.createObjectURL(blob);
+      const img = document.createElement('img');
+      img.src = lastBlobUrl;
+      img.alt = prompt;
+      canvas.innerHTML = '';
+      canvas.appendChild(img);
+      downloadBtn.disabled = false;
+      downloadBtn.onclick = () => {
+        const a = document.createElement('a');
+        a.href = lastBlobUrl;
+        a.download = `${prompt.replace(/[^\w\d\-_.]/g,'_').slice(0,80)||'image'}.jpg`;
+        a.click();
+      };
+      setStatus('Imagem gerada com sucesso.');
+    } catch (err) {
+      clearPreview();
+      setStatus('Erro: ' + (err.message || err));
+    }
+  });
+
+  copyBtn.addEventListener('click', async ()=>{
+    try {
+      await navigator.clipboard.writeText(promptEl.value);
+      setStatus('Prompt copiado para a área de transferência.');
+    } catch {
+      setStatus('Não foi possível copiar automaticamente.');
+    }
+  });
+
+  clearBtn.addEventListener('click', ()=>{
+    promptEl.value = '';
+    seedEl.value = '';
+    widthEl.value = 1280;
+    heightEl.value = 720;
+    modelEl.value = 'flux';
+    nologoEl.value = 'false';
+    clearPreview();
+    setStatus('Campos limpos.');
+  });
+
+  clearPreview();
+})();
+</script>
+</body>
+</html>
